@@ -1,4 +1,4 @@
-# LossLens — P&C Claims Fraud Triage & Loss Analytics
+# Insurance Fraud Triage & Loss Intelligence
 
 Insurance analytics with testable claims: a synthetic auto book (6,000
 policies, 897 claims) with **six planted fraud rings** whose membership is
