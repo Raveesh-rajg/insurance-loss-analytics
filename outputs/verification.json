@@ -1,0 +1,14 @@
+{
+  "data": "Synthetic policies and planted rings; not real-person fraud decisions.",
+  "policies": 6000,
+  "claims": 897,
+  "precision_at_50": {
+    "rules_only": 0.86,
+    "rules+graph": 0.84,
+    "rules+graph+anomaly": 0.84,
+    "all_four": 1.0,
+    "baseline_random": 0.09810479375696766
+  },
+  "loss_definition": "Paid amounts; no reserves or IBNR. Full annual premium allocated to policy year.",
+  "triangle_cutoff": "2026-01-03"
+}

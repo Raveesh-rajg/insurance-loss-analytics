@@ -1,58 +1,53 @@
-# Insurance Fraud Triage & Loss Intelligence
+# Insurance Loss & Referral Analytics
 
-Insurance analytics with testable claims: a synthetic auto book (6,000
-policies, 897 claims) with **six planted fraud rings** whose membership is
-known ground truth — so fraud-detection performance is measured
-(precision@k against planted labels), never anecdotal. Plus the classical
-P&C toolkit: accident-year loss ratios and paid development triangles with
-age-to-age factors.
+Compare referral-score signal families and calculate paid loss ratios and valuation-aware development triangles.
 
-## Measured results (seeded, reproducible, pinned by 8 tests)
+## Implementation and validation
 
-```
-referral queue precision@50 (share of top-50 that are truly fraudulent):
-  random baseline          9.8%
-  rules only              86%
-  rules+graph             84%
-  rules+graph+anomaly     84%
-  all four (+ notes)     100%
-```
+Local analytics and 12 regression checks pass. Future development periods remain null; factors use matched observed cells. The Power BI report in docs is a build specification, not a rendered report.
 
-Two honest findings the ablation surfaces:
-1. **Adjuster-note signals add the most** on top of rules — the planted ring
-   notes carry patterns (identical statements, no police report, estimate-
-   before-inspection) that numeric features can't see. This is the argument
-   for LLM note triage in a real SIU workflow; here the note scorer is a
-   deterministic lexicon (testable), with a live-LLM slot documented.
-2. **Adding graph/anomaly under equal weighting slightly DILUTED rules**
-   (86→84%) before notes recovered it — a real lesson about naive score
-   averaging that a fitted combiner would hide (and on synthetic data, a
-   fitted combiner would just memorize the generator — deliberately avoided,
-   documented in triage.py).
+Automated checks: **12 tests**. The GitHub Actions run linked above the file browser is the current CI result. Local checks and external integrations are separate claims.
 
-Loss analytics: AY loss ratios in a plausible band, cumulative triangles
-non-decreasing with age-to-age factors ≥ 1 — all asserted by tests.
+## Reproduce locally
 
-## What's synthetic and why that's the method
+Use Python 3.12. Run from this repository’s root in a fresh virtual environment.
 
-Real claims data is PII-bound and proprietary. The generator IS the
-methodology: fraud rings share phones and repair shops, file within 60 days
-of inception, cluster in low-visibility hours, at inflated severities —
-and `true_label` exists for EVALUATION only, never as a feature (guarded by
-test). Earning is simplified to policy-year allocation (documented; pro-rata
-daily earning is the extension).
-
-## Run
-
-```bash
-pip install pandas scikit-learn pytest
-PYTHONPATH=src python src/losslens/generate.py   # build the book
-PYTHONPATH=src pytest tests/ -q                  # 8 tests
+```sh
+python -m venv .venv
+# Activate .venv for your shell, then:
+python -m pip install -r requirements.txt
 ```
 
+For repositories using `src/`, set the import path before running commands:
+
+```powershell
+# PowerShell
+$env:PYTHONPATH="src"
 ```
-src/losslens/generate.py      the planted-ring book generator
-src/losslens/triage.py        4 signal families + ablation eval
-src/losslens/loss_metrics.py  AY/CY loss ratios, triangles, ATA factors
-docs/POWERBI_SPEC.md          report spec: triangle matrix, referral queue, ring graph
+```sh
+# macOS/Linux
+export PYTHONPATH=src
 ```
+
+```sh
+python run_pipeline.py
+python -m pytest tests -q
+```
+
+## Data and interpretation
+
+Synthetic policies, claims and planted fraud rings. Referral scores are research signals, not decisions about real people. Paid loss is not incurred loss; annual premium allocation is a simplified denominator.
+
+## Inspect the work
+
+- [`tests/`](tests/) — executable checks and examples.
+- [`docs/`](docs/) — methodology, integration specifications and the historical design.
+- [Portfolio](https://raveesh-rajg.github.io/) — project directory.
+
+## Completion boundary
+
+Passing local tests establishes the checks listed in this repository. It does not establish cloud deployment, real-data quality, production security, or native BI rendering unless an explicit verification record says so.
+
+## Exported evidence
+
+[`outputs/`](outputs/) contains regenerated CSV tables and `verification.json`. Run `python run_pipeline.py` to rebuild every export. These are analytical outputs, not screenshots of a native BI report.
